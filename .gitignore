@@ -1,0 +1,6 @@
+.env
+/src/data/
+*.mp3
+*.mp4
+*.ogg
+/src/ffmpeg/

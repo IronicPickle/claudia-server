@@ -1,0 +1,19 @@
+import { Config } from "./config.ts";
+import "https://deno.land/x/dotenv@v3.2.0/load.ts";
+
+const config: Config = {
+  authSecret: Deno.env.get("AUTH_SECRET") as string,
+  internal: {
+    botAddress: Deno.env.get("INTERNAL_BOT_ADDRESS") ?? "http://localhost:8081",
+  },
+  oak: {
+    listenOptions: {
+      port: parseInt(Deno.env.get("OAK_PORT") ?? "8080"),
+    },
+  },
+  mongo: {
+    address: Deno.env.get("MONGO_ADDRESS") ?? "mongodb://127.0.0.1:27017",
+  },
+};
+
+export default config;
