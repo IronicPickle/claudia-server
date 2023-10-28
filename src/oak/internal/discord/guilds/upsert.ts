@@ -1,4 +1,4 @@
-import { GuildUpsert } from "../../../../../claudia-shared/lib/ts/api/server/internal/guilds/guilds.ts";
+import { GuildUpsert } from "../../../../../../claudia-shared/lib/ts/api/server/internal/discord/guilds.ts";
 import {
   badRequestError,
   error,
@@ -6,12 +6,12 @@ import {
   parseBody,
   parseParams,
   validationError,
-} from "../../../../../claudia-shared/lib/utils/api.ts";
-import { router } from "../../setupOak.ts";
-import guildsValidator from "../../../../../claudia-shared/lib/validators/server/internal/guilds/guildsValidator.ts";
-import { parseValidators } from "../../../../../claudia-shared/lib/utils/generic.ts";
-import Guild from "../../../mongo/schemas/Guild.ts";
-import { logError } from "../../../../../claudia-bot/src/lib/utils/generic.ts";
+} from "../../../../../../claudia-shared/lib/utils/api.ts";
+import { router } from "../../../setupOak.ts";
+import guildsValidator from "../../../../../../claudia-shared/lib/validators/server/internal/discord/guilds/guildsValidator.ts";
+import { parseValidators } from "../../../../../../claudia-shared/lib/utils/generic.ts";
+import Guild from "../../../../mongo/schemas/Guild.ts";
+import { logError } from "../../../../lib/utils/generic.ts";
 
 export default () => {
   router.put("/internal/discord/guilds/:guildId", async (ctx) => {

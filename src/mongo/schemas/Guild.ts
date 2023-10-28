@@ -4,6 +4,7 @@ export interface GuildSchema {
   guildId: string;
   name: string;
   description: string | null | undefined;
+  active: boolean;
   joinedAt: number | undefined;
 }
 

@@ -3,6 +3,7 @@ import { log } from "./lib/utils/generic.ts";
 import setupOak from "./oak/setupOak.ts";
 
 import "./mongo/setupMongo.ts";
+import startupSetup from "./startupSetup.ts";
 
 const start = async () => {
   if (!config.authSecret) throw Error("AUTH_SECRET missing in env!");
@@ -12,6 +13,7 @@ const start = async () => {
   log(config);
 
   setupOak();
+  startupSetup();
 };
 
 start();

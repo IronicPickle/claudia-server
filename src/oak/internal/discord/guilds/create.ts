@@ -1,4 +1,4 @@
-import { GuildCreate } from "../../../../../claudia-shared/lib/ts/api/server/internal/guilds/guilds.ts";
+import { GuildCreate } from "../../../../../../claudia-shared/lib/ts/api/server/internal/discord/guilds.ts";
 import {
   badRequestError,
   conflictError,
@@ -6,12 +6,12 @@ import {
   ok,
   parseBody,
   validationError,
-} from "../../../../../claudia-shared/lib/utils/api.ts";
-import { router } from "../../setupOak.ts";
-import guildsValidator from "../../../../../claudia-shared/lib/validators/server/internal/guilds/guildsValidator.ts";
-import { parseValidators } from "../../../../../claudia-shared/lib/utils/generic.ts";
-import Guild from "../../../mongo/schemas/Guild.ts";
-import { logError } from "../../../../../claudia-bot/src/lib/utils/generic.ts";
+} from "../../../../../../claudia-shared/lib/utils/api.ts";
+import { router } from "../../../setupOak.ts";
+import guildsValidator from "../../../../../../claudia-shared/lib/validators/server/internal/discord/guilds/guildsValidator.ts";
+import { parseValidators } from "../../../../../../claudia-shared/lib/utils/generic.ts";
+import Guild from "../../../../mongo/schemas/Guild.ts";
+import { logError } from "../../../../lib/utils/generic.ts";
 
 export default () => {
   router.post("/internal/discord/guilds", async (ctx) => {
@@ -30,7 +30,13 @@ export default () => {
       const guild = await Guild.findOne({ guildId });
       if (guild) return conflictError("Guild already exists.")(ctx);
 
-      await Guild.insertOne({ guildId, name, description, joinedAt });
+      await Guild.insertOne({
+        guildId,
+        active: true,
+        name,
+        description,
+        joinedAt,
+      });
 
       return ok(guild)(ctx);
     } catch (err: any) {
