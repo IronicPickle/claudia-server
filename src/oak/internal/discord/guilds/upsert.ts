@@ -44,7 +44,7 @@ export default () => {
       const memberIds = members.map(({ memberId }) => memberId);
 
       await DiscordGuildMember.updateMany(
-        { memberId: { $nin: memberIds } },
+        { memberId: { $nin: memberIds }, guildId },
         {
           $set: { active: false },
         }
