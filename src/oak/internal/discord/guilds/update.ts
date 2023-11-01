@@ -1,17 +1,17 @@
-import { GuildUpdate } from "../../../../../../claudia-shared/lib/ts/api/server/internal/discord/guilds.ts";
+import { GuildUpdate } from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/guildsSpec.ts";
 import {
   badRequestError,
-  conflictError,
   error,
+  notFoundError,
   ok,
   parseBody,
   parseParams,
   validationError,
 } from "../../../../../../claudia-shared/lib/utils/api.ts";
 import { router } from "../../../setupOak.ts";
-import guildsValidator from "../../../../../../claudia-shared/lib/validators/server/internal/discord/guilds/guildsValidator.ts";
+import guildsValidator from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/guildsValidator.ts";
 import { parseValidators } from "../../../../../../claudia-shared/lib/utils/generic.ts";
-import Guild from "../../../../mongo/schemas/Guild.ts";
+import DiscordGuild from "../../../../mongo/schemas/DiscordGuild.ts";
 import { logError } from "../../../../lib/utils/generic.ts";
 
 export default () => {
@@ -26,10 +26,10 @@ export default () => {
     const validators = guildsValidator.update({ ...params, ...body });
 
     const validation = parseValidators(validators);
-    if (validation.failed || !guildId) return validationError(validation)(ctx);
+    if (validation.failed) return validationError(validation)(ctx);
 
     try {
-      const guild = await Guild.findAndModify(
+      const guild = await DiscordGuild.findAndModify(
         { guildId },
         {
           update: {
@@ -45,7 +45,7 @@ export default () => {
         }
       );
 
-      if (!guild) return conflictError("Guild doesn't exist.")(ctx);
+      if (!guild) return notFoundError("Guild doesn't exist.")(ctx);
 
       return ok(guild)(ctx);
     } catch (err: any) {

@@ -1,6 +1,6 @@
 import { db } from "../setupMongo.ts";
 
-export interface GuildSchema {
+export interface DiscordGuildSchema {
   guildId: string;
   name: string;
   description: string | null | undefined;
@@ -8,4 +8,4 @@ export interface GuildSchema {
   joinedAt: number | undefined;
 }
 
-export default db.collection<GuildSchema>("guild");
+export default db.collection<DiscordGuildSchema>("discordGuild");
