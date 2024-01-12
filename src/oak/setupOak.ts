@@ -1,6 +1,9 @@
 import config from "../config/config.ts";
 import { Application, Router } from "../deps/oak.ts";
 import { log } from "../lib/utils/generic.ts";
+import { ConsoleColor } from "../../../claudia-shared/lib/enums/generic.ts";
+import { httpMethodColors } from "../../../claudia-shared/lib/constants/generic.ts";
+import { decodeJwt } from "../lib/utils/api.ts";
 
 import internalGuildsCreate from "./internal/discord/guilds/create.ts";
 import internalGuildsUpdate from "./internal/discord/guilds/update.ts";
@@ -10,11 +13,13 @@ import internalGuildsSync from "./internal/discord/guilds/sync.ts";
 import internalGuildsMembersCreate from "./internal/discord/guilds/members/create.ts";
 import internalGuildsMembersUpdate from "./internal/discord/guilds/members/update.ts";
 import internalGuildsMembersUpsert from "./internal/discord/guilds/members/upsert.ts";
-import { ConsoleColor } from "../../../claudia-shared/lib/enums/generic.ts";
-import { httpMethodColors } from "../../../claudia-shared/lib/constants/generic.ts";
 
-export const app = new Application();
-export const router = new Router();
+interface State {
+  userId?: "internal" | string;
+}
+
+export const app = new Application<State>();
+export const router = new Router<State>();
 
 export default () => {
   app.use(async ({ request }, next) => {
@@ -31,6 +36,16 @@ export default () => {
       ConsoleColor.Reset
     );
 
+    await next();
+  });
+
+  app.use(async ({ state, request }, next) => {
+    const jwt = request.headers.get("Authorization")?.replace("BEARER ", "");
+    if (jwt) {
+      const payload = await decodeJwt(jwt);
+
+      if (payload) state.userId = payload.sub;
+    }
     await next();
   });
 
