@@ -5,7 +5,6 @@ import {
   parseBody,
   validationError,
 } from "../../../../../../claudia-shared/lib/utils/api.ts";
-import { router } from "../../../setupOak.ts";
 import guildsValidator from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/guildsValidator.ts";
 import { parseValidators } from "../../../../../../claudia-shared/lib/utils/generic.ts";
 import DiscordGuild from "../../../../mongo/schemas/DiscordGuild.ts";
@@ -13,9 +12,10 @@ import { GuildsSync } from "../../../../../../claudia-shared/lib/api/server/inte
 import { log, logError } from "../../../../lib/utils/generic.ts";
 import DiscordGuildMember from "../../../../mongo/schemas/DiscordGuildMember.ts";
 import { upsertGuilds } from "./utils.ts";
+import { createRoute } from "../../../setupOak.ts";
 
-export default () => {
-  router.put("/internal/discord/guilds/sync", async (ctx) => {
+export default createRoute((router) => {
+  router.put("/sync", async (ctx) => {
     const body = await parseBody<GuildsSync["body"]>(ctx);
     if (!body) return badRequestError("Body missing.")(ctx);
 
@@ -99,4 +99,4 @@ export default () => {
       return error("Something went wrong.")(ctx);
     }
   });
-};
+});

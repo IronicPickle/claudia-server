@@ -8,16 +8,16 @@ import {
   parseParams,
   validationError,
 } from "../../../../../../claudia-shared/lib/utils/api.ts";
-import { router } from "../../../setupOak.ts";
 import guildsValidator from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/guildsValidator.ts";
 import { parseValidators } from "../../../../../../claudia-shared/lib/utils/generic.ts";
 import DiscordGuild from "../../../../mongo/schemas/DiscordGuild.ts";
 import { logError } from "../../../../lib/utils/generic.ts";
 import { upsertMembers } from "./utils.ts";
 import DiscordGuildMember from "../../../../mongo/schemas/DiscordGuildMember.ts";
+import { createRoute } from "../../../setupOak.ts";
 
-export default () => {
-  router.post("/internal/discord/guilds/:guildId", async (ctx) => {
+export default createRoute((router) => {
+  router.post("/:guildId", async (ctx) => {
     const params = parseParams<GuildCreate["params"]>(ctx);
     const body = await parseBody<GuildCreate["body"]>(ctx);
     if (!body) return badRequestError("Body missing.")(ctx);
@@ -59,4 +59,4 @@ export default () => {
       return error("Something went wrong.")(ctx);
     }
   });
-};
+});

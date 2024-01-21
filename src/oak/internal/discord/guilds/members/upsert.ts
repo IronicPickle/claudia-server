@@ -14,86 +14,83 @@ import DiscordGuildMember from "../../../../../mongo/schemas/DiscordGuildMember.
 import DiscordUser, {
   DiscordUserSchema,
 } from "../../../../../mongo/schemas/DiscordUser.ts";
-import { router } from "../../../../setupOak.ts";
+import { createRoute } from "../../../../setupOak.ts";
 
-export default () => {
-  router.put(
-    "/internal/discord/guilds/:guildId/members/:memberId",
-    async (ctx) => {
-      const params = parseParams<GuildMemberUpsert["params"]>(ctx);
-      const body = await parseBody<GuildMemberUpsert["body"]>(ctx);
-      if (!body) return badRequestError("Body missing.")(ctx);
+export default createRoute((router) => {
+  router.put("/:memberId", async (ctx) => {
+    const params = parseParams<GuildMemberUpsert["params"]>(ctx);
+    const body = await parseBody<GuildMemberUpsert["body"]>(ctx);
+    if (!body) return badRequestError("Body missing.")(ctx);
 
-      const { guildId, memberId } = params;
+    const { guildId, memberId } = params;
 
-      const {
-        active,
-        avatar,
-        joinedAt,
-        nick,
-        permissions,
-        roles,
-        communicationDisabledUntil,
-        premiumSince,
+    const {
+      active,
+      avatar,
+      joinedAt,
+      nick,
+      permissions,
+      roles,
+      communicationDisabledUntil,
+      premiumSince,
 
-        user,
-      } = body;
+      user,
+    } = body;
 
-      const validators = membersValidators.upsert({ ...params, ...body });
+    const validators = membersValidators.upsert({ ...params, ...body });
 
-      const validation = parseValidators(validators);
-      if (validation.failed) return validationError(validation)(ctx);
+    const validation = parseValidators(validators);
+    if (validation.failed) return validationError(validation)(ctx);
 
-      try {
-        const newMember = await DiscordGuildMember.findAndModify(
-          { guildId, memberId },
+    try {
+      const newMember = await DiscordGuildMember.findAndModify(
+        { guildId, memberId },
+        {
+          update: {
+            $set: {
+              userId: user?.userId,
+              active,
+              avatar,
+              joinedAt,
+              nick,
+              permissions,
+              roles,
+              communicationDisabledUntil,
+              premiumSince,
+            },
+          },
+          upsert: true,
+          new: true,
+        }
+      );
+
+      if (!newMember) return error("Couldn't upsert guild member.")(ctx);
+
+      let newUser: DiscordUserSchema | undefined;
+
+      if (user) {
+        newUser = await DiscordUser.findAndModify(
+          { userId: user.userId },
           {
             update: {
               $set: {
-                userId: user?.userId,
-                active,
-                avatar,
-                joinedAt,
-                nick,
-                permissions,
-                roles,
-                communicationDisabledUntil,
-                premiumSince,
+                username: user.username,
+                discriminator: user.discriminator,
+                avatar: user.avatar,
+                locale: user.locale,
+                premiumType: user.premiumType,
               },
             },
             upsert: true,
             new: true,
           }
         );
-
-        if (!newMember) return error("Couldn't upsert guild member.")(ctx);
-
-        let newUser: DiscordUserSchema | undefined;
-
-        if (user) {
-          newUser = await DiscordUser.findAndModify(
-            { userId: user.userId },
-            {
-              update: {
-                $set: {
-                  username: user.username,
-                  discriminator: user.discriminator,
-                  avatar: user.avatar,
-                  locale: user.locale,
-                  premiumType: user.premiumType,
-                },
-              },
-              upsert: true,
-              new: true,
-            }
-          );
-        }
-
-        return ok({ ...newMember, user: newUser })(ctx);
-      } catch (err: any) {
-        logError(err);
-        return error("Something went wrong.")(ctx);
       }
+
+      return ok({ ...newMember, user: newUser })(ctx);
+    } catch (err: any) {
+      logError(err);
+      return error("Something went wrong.")(ctx);
     }
-  );
-};
+  });
+});
