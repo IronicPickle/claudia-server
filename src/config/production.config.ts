@@ -14,6 +14,10 @@ const config: Config = {
   mongo: {
     address: Deno.env.get("MONGO_ADDRESS") ?? "mongodb://127.0.0.1:27017",
   },
+  discord: {
+    clientId: Deno.env.get("DISCORD_CLIENT_ID") as string,
+    clientSecret: Deno.env.get("DISCORD_CLIENT_SECRET") as string,
+  },
 };
 
 export default config;

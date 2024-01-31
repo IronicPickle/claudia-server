@@ -1,4 +1,4 @@
-import eventStartup from "./api/internal/events/eventStartup.ts";
+import Endpoints from "./api/Endpoints.ts";
 import { log, logError } from "./lib/utils/generic.ts";
 
 export default async () => {
@@ -8,7 +8,7 @@ export default async () => {
 export const sendStartupEvent = async () => {
   log("[Initial Setup]", "Sending startup event...");
 
-  const { error } = await eventStartup({});
+  const { error } = await Endpoints.internal.events.startup.call({});
 
   if (error) logError(error.error);
 };

@@ -1,5 +1,3 @@
-import { GuildMemberCreate } from "../../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/members/membersSpec.ts";
-import membersValidators from "../../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/members/membersValidators.ts";
 import {
   badRequestError,
   conflictError,
@@ -19,10 +17,15 @@ import DiscordUser, {
 } from "../../../../../mongo/schemas/DiscordUser.ts";
 import { createRoute } from "../../../../setupOak.ts";
 
+import {
+  RequestSpec,
+  validator,
+} from "../../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/{guildId}/members/{memberId}/create.ts";
+
 export default createRoute((router) => {
   router.post("/:memberId", async (ctx) => {
-    const params = parseParams<GuildMemberCreate["params"]>(ctx);
-    const body = await parseBody<GuildMemberCreate["body"]>(ctx);
+    const params = parseParams<RequestSpec["params"]>(ctx);
+    const body = await parseBody<RequestSpec["body"]>(ctx);
     if (!body) return badRequestError("Body missing.")(ctx);
 
     const { guildId, memberId } = params;
@@ -39,7 +42,7 @@ export default createRoute((router) => {
       user,
     } = body;
 
-    const validators = membersValidators.create({ ...params, ...body });
+    const validators = validator({ ...params, ...body });
 
     const validation = parseValidators(validators);
     if (validation.failed) return validationError(validation)(ctx);

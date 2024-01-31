@@ -1,4 +1,3 @@
-import { GuildUpsert } from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/guildsSpec.ts";
 import {
   badRequestError,
   error,
@@ -7,7 +6,6 @@ import {
   parseParams,
   validationError,
 } from "../../../../../../claudia-shared/lib/utils/api.ts";
-import guildsValidator from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/guildsValidator.ts";
 import { parseValidators } from "../../../../../../claudia-shared/lib/utils/generic.ts";
 import DiscordGuild from "../../../../mongo/schemas/DiscordGuild.ts";
 import { logError } from "../../../../lib/utils/generic.ts";
@@ -15,16 +13,21 @@ import { upsertMembers } from "./utils.ts";
 import DiscordGuildMember from "../../../../mongo/schemas/DiscordGuildMember.ts";
 import { createRoute } from "../../../setupOak.ts";
 
+import {
+  RequestSpec,
+  validator,
+} from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/{guildId}/upsert.ts";
+
 export default createRoute((router) => {
   router.put("/:guildId", async (ctx) => {
-    const params = parseParams<GuildUpsert["params"]>(ctx);
-    const body = await parseBody<GuildUpsert["body"]>(ctx);
+    const params = parseParams<RequestSpec["params"]>(ctx);
+    const body = await parseBody<RequestSpec["body"]>(ctx);
     if (!body) return badRequestError("Body missing.")(ctx);
 
     const { guildId } = params;
     const { active, name, description, joinedAt, members } = body;
 
-    const validators = guildsValidator.upsert({ ...params, ...body });
+    const validators = validator({ ...params, ...body });
 
     const validation = parseValidators(validators);
     if (validation.failed) return validationError(validation)(ctx);

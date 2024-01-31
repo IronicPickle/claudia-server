@@ -13,6 +13,10 @@ export interface Config {
   mongo: {
     address: string;
   };
+  discord: {
+    clientId: string;
+    clientSecret: string;
+  };
 }
 
 export const env = Deno.env.get("DENO_ENV") ?? "development";

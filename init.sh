@@ -17,6 +17,9 @@ if [ ! -e .env ]; then
   echo "" >> .env
   echo "MONGO_ADDRESS=mongodb://$username:$password@127.0.0.1:27017" >> .env
   echo "" >> .env
+  echo "DISCORD_CLIENT_ID=" >> .env
+  echo "DISCORD_CLIENT_SECRET=" >> .env
+  echo "" >> .env
   echo "AUTH_SECRET=keyboard_cat" >> .env
 else
   echo "> .env already exists, skipping..."

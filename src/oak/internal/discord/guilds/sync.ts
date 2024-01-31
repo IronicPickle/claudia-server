@@ -5,23 +5,27 @@ import {
   parseBody,
   validationError,
 } from "../../../../../../claudia-shared/lib/utils/api.ts";
-import guildsValidator from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/guildsValidator.ts";
 import { parseValidators } from "../../../../../../claudia-shared/lib/utils/generic.ts";
 import DiscordGuild from "../../../../mongo/schemas/DiscordGuild.ts";
-import { GuildsSync } from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/guildsSpec.ts";
 import { log, logError } from "../../../../lib/utils/generic.ts";
 import DiscordGuildMember from "../../../../mongo/schemas/DiscordGuildMember.ts";
 import { upsertGuilds } from "./utils.ts";
 import { createRoute } from "../../../setupOak.ts";
+{
+}
+import {
+  RequestSpec,
+  validator,
+} from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/sync.ts";
 
 export default createRoute((router) => {
   router.put("/sync", async (ctx) => {
-    const body = await parseBody<GuildsSync["body"]>(ctx);
+    const body = await parseBody<RequestSpec["body"]>(ctx);
     if (!body) return badRequestError("Body missing.")(ctx);
 
     const { guilds } = body;
 
-    const validators = guildsValidator.sync(body);
+    const validators = validator(body);
 
     const validation = parseValidators(validators);
     if (validation.failed) return validationError(validation)(ctx);
