@@ -8,6 +8,14 @@ export interface DiscordUserSchema {
   avatar: string | undefined;
   locale: string | undefined;
   premiumType: DbDiscordPremiumTypes | undefined;
+
+  discordOauth?: {
+    accessToken: string;
+    tokenType: string;
+    expiresIn: number;
+    refreshToken: string;
+    scope: string;
+  };
 }
 
 export default db.collection<DiscordUserSchema>("discordUser");

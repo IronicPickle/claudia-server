@@ -4,6 +4,7 @@ import { log } from "../lib/utils/generic.ts";
 import { ConsoleColor } from "../../../claudia-shared/lib/enums/generic.ts";
 import { httpMethodColors } from "../../../claudia-shared/lib/constants/generic.ts";
 import { decodeJwt } from "../lib/utils/api.ts";
+import { oakCors } from "../deps/oak.ts";
 
 export interface State {
   userId?: "internal" | string;
@@ -46,6 +47,12 @@ export default async () => {
 
   await import("./routes.ts");
 
+  app.use(
+    oakCors({
+      origin: "http://localhost:5173",
+      credentials: true,
+    })
+  );
   app.use(router.routes());
   app.use(router.allowedMethods());
 

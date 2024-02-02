@@ -1,9 +1,9 @@
 import { Router } from "../../deps/oak.ts";
 import { State } from "../setupOak.ts";
-import discordRouter from "./discord/router.ts";
+import login from "./login.ts";
 
-const internalRouter = new Router<State>();
+const authRouter = new Router<State>();
 
-internalRouter.use("/discord", discordRouter.routes());
+login.register(authRouter);
 
-export default internalRouter;
+export default authRouter;
