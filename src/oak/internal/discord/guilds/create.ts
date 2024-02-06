@@ -6,18 +6,18 @@ import {
   parseBody,
   parseParams,
   validationError,
-} from "../../../../../../claudia-shared/lib/utils/api.ts";
-import { parseValidators } from "../../../../../../claudia-shared/lib/utils/generic.ts";
-import DiscordGuild from "../../../../mongo/schemas/DiscordGuild.ts";
-import { logError } from "../../../../lib/utils/generic.ts";
+} from "@shared/lib/utils/api.ts";
+import { parseValidators } from "@shared/lib/utils/generic.ts";
+import DiscordGuild from "@mongo/schemas/DiscordGuild.ts";
+import { logError } from "@utils/generic.ts";
 import { upsertMembers } from "./utils.ts";
-import DiscordGuildMember from "../../../../mongo/schemas/DiscordGuildMember.ts";
-import { createRoute } from "../../../setupOak.ts";
+import DiscordGuildMember from "@mongo/schemas/DiscordGuildMember.ts";
+import { createRoute } from "@oak/setupOak.ts";
 
 import {
   RequestSpec,
   validator,
-} from "../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/{guildId}/create.ts";
+} from "@shared/lib/api/server/internal/discord/guilds/{guildId}/create.ts";
 
 export default createRoute((router) => {
   router.post("/:guildId", async (ctx) => {

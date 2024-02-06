@@ -1,10 +1,10 @@
-import config from "../config/config.ts";
-import { Application, Router } from "../deps/oak.ts";
-import { log } from "../lib/utils/generic.ts";
-import { ConsoleColor } from "../../../claudia-shared/lib/enums/generic.ts";
-import { httpMethodColors } from "../../../claudia-shared/lib/constants/generic.ts";
-import { decodeJwt } from "../lib/utils/api.ts";
-import { oakCors } from "../deps/oak.ts";
+import config from "@config/config.ts";
+import { Application, Router } from "oak";
+import { log } from "@utils/generic.ts";
+import { ConsoleColor } from "@shared/lib/enums/generic.ts";
+import { httpMethodColors } from "@shared/lib/constants/generic.ts";
+import { decodeJwt } from "@utils/api.ts";
+import { oakCors } from "cors";
 
 export interface State {
   userId?: "internal" | string;

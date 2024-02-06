@@ -1,7 +1,7 @@
-import Endpoint from "../../lib/objects/Endpoint.ts";
-import { discordApi } from "../discordApi.ts";
+import Endpoint from "@objects/Endpoint.ts";
+import { discordApi } from "@discordApi/discordApi.ts";
 
-import { RequestSpec } from "../../../../claudia-shared/lib/discordApi/oauth2/@me.ts";
+import { RequestSpec } from "@shared/lib/discordApi/oauth2/@me.ts";
 
 export default new Endpoint<RequestSpec>(
   async ({ body: { access_token } }) =>

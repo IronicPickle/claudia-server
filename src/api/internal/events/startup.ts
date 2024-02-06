@@ -1,6 +1,6 @@
-import { RequestSpec } from "../../../../../claudia-shared/lib/api/bot/internal/events/startup.ts";
-import Endpoint from "../../../lib/objects/Endpoint.ts";
-import { api } from "../../api.ts";
+import { RequestSpec } from "@shared/lib/api/bot/internal/events/startup.ts";
+import Endpoint from "@objects/Endpoint.ts";
+import { api } from "@api/api.ts";
 
 export default new Endpoint<RequestSpec>(
   async () =>

@@ -1,5 +1,6 @@
-import { Router } from "../../../../deps/oak.ts";
-import { State } from "../../../setupOak.ts";
+import { Router } from "oak";
+import { State } from "@oak/setupOak.ts";
+
 import membersRouter from "./members/router.ts";
 
 import create from "./create.ts";

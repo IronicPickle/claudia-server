@@ -1,17 +1,17 @@
-import { db } from "../setupMongo.ts";
+import { db } from "@mongo/setupMongo.ts";
 
 export interface DiscordGuildMemberSchema {
   memberId: string;
   guildId: string;
-  userId: string | undefined;
+  userId?: string;
   active: boolean;
-  avatar: string | undefined;
+  avatar?: string;
   joinedAt: number;
-  nick: string | undefined;
-  permissions: string | undefined;
+  nick?: string;
+  permissions?: string;
   roles: string[];
-  communicationDisabledUntil: number | undefined;
-  premiumSince: number | undefined;
+  communicationDisabledUntil?: number;
+  premiumSince?: number;
 }
 
 export default db.collection<DiscordGuildMemberSchema>("discordGuildMember");

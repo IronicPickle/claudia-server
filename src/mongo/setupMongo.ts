@@ -1,5 +1,5 @@
-import config from "../config/config.ts";
-import { MongoClient } from "../deps/denoMongo.ts";
+import config from "@config/config.ts";
+import { MongoClient } from "mongo";
 
 const client = new MongoClient();
 

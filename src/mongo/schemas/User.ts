@@ -1,7 +1,14 @@
-import { db } from "../setupMongo.ts";
+import { db } from "@mongo/setupMongo.ts";
 
-export interface DiscordUserSchema {
+export interface UserSchema {
   discordUserId: string;
+  discordOauth?: {
+    accessToken: string;
+    tokenType: string;
+    expiresIn: number;
+    refreshToken: string;
+    scope: string;
+  };
 }
 
-export default db.collection<DiscordUserSchema>("discordUser");
+export default db.collection<UserSchema>("user");

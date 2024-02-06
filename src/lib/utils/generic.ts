@@ -1,6 +1,6 @@
-import { ConsoleColor } from "../../../../claudia-shared/lib/enums/generic.ts";
-import { enumContains } from "../../../../claudia-shared/lib/utils/generic.ts";
-import { isDev } from "../../config/config.ts";
+import { ConsoleColor } from "@shared/lib/enums/generic.ts";
+import { enumContains } from "@shared/lib/utils/generic.ts";
+import { isDev } from "@config/config.ts";
 
 export const log = (...text: any[]) =>
   console.log(

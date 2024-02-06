@@ -1,11 +1,11 @@
-import { db } from "../setupMongo.ts";
+import { db } from "@mongo/setupMongo.ts";
 
 export interface DiscordGuildSchema {
   guildId: string;
   name: string;
-  description: string | null | undefined;
+  description?: string | null;
   active: boolean;
-  joinedAt: number | undefined;
+  joinedAt?: number;
 }
 
 export default db.collection<DiscordGuildSchema>("discordGuild");

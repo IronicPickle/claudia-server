@@ -1,10 +1,10 @@
 import {
   DbDiscordGuild,
   DbDiscordMember,
-} from "../../../../../../claudia-shared/lib/api/server/internal/discord/dbSpec.ts";
-import DiscordGuild from "../../../../mongo/schemas/DiscordGuild.ts";
-import DiscordGuildMember from "../../../../mongo/schemas/DiscordGuildMember.ts";
-import DiscordUser from "../../../../mongo/schemas/DiscordUser.ts";
+} from "@shared/lib/api/server/internal/discord/dbSpec.ts";
+import DiscordGuild from "@mongo/schemas/DiscordGuild.ts";
+import DiscordGuildMember from "@mongo/schemas/DiscordGuildMember.ts";
+import DiscordUser from "@mongo/schemas/DiscordUser.ts";
 
 export const upsertMembers = (members: DbDiscordMember[]) => {
   const promises: Promise<{

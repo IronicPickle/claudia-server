@@ -1,4 +1,4 @@
-import ky from "../deps/ky.ts";
+import ky from "ky";
 
 export const discordApi = ky.create({
   prefixUrl: "https://discord.com/api/v10/",

@@ -1,5 +1,5 @@
-import Endpoints from "./api/Endpoints.ts";
-import { log, logError } from "./lib/utils/generic.ts";
+import Endpoints from "@api/Endpoints.ts";
+import { log, logError } from "@utils/generic.ts";
 
 export default async () => {
   await sendStartupEvent();
