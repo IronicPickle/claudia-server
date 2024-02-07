@@ -2,6 +2,7 @@ import { DbDiscordPremiumTypes } from "@shared/lib/api/server/internal/discord/d
 import { db } from "@mongo/setupMongo.ts";
 
 export interface DiscordUserSchema {
+  _id: string;
   userId: string;
   username: string;
   discriminator: string;

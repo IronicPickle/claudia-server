@@ -3,8 +3,8 @@ import { Application, Router } from "oak";
 import { log } from "@utils/generic.ts";
 import { ConsoleColor } from "@shared/lib/enums/generic.ts";
 import { httpMethodColors } from "@shared/lib/constants/generic.ts";
-import { decodeJwt } from "@utils/api.ts";
 import { oakCors } from "cors";
+import { decodeJwt } from "@utils/api.ts";
 
 export interface State {
   userId?: "internal" | string;

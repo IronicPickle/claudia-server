@@ -1,6 +1,6 @@
 import config from "@config/config.ts";
 import dayjs from "dayjs";
-import { create, verify } from "djwt";
+import { VerifyOptions, create, verify } from "djwt";
 
 const jwtKey = await crypto.subtle.importKey(
   "raw",
@@ -12,7 +12,7 @@ const jwtKey = await crypto.subtle.importKey(
 
 export const encodeJwt = (
   id: "internal" | string,
-  expiry: number,
+  expiry?: number,
   payload?: Record<any, any>
 ) =>
   create(
@@ -24,7 +24,7 @@ export const encodeJwt = (
       sub: id,
       nbf: dayjs().unix(),
       iat: dayjs().unix(),
-      exp: dayjs().add(expiry, "ms").unix(),
+      exp: expiry != null ? dayjs().add(expiry, "ms").unix() : undefined,
       ...payload,
     },
     jwtKey
@@ -33,7 +33,6 @@ export const encodeJwt = (
 const ONE_HOUR_MS = 1000 * 60 * 60;
 
 const SESSION_EXPIRY_MS = ONE_HOUR_MS * 1;
-const REFRESH_EXPIRY_MS = ONE_HOUR_MS * 1;
 
 export const encodeSessionJwt = (
   id: "internal" | string,
@@ -43,11 +42,11 @@ export const encodeSessionJwt = (
 export const encodeRefreshJwt = (
   id: "internal" | string,
   payload?: Record<any, any>
-) => encodeJwt(id, REFRESH_EXPIRY_MS, payload);
+) => encodeJwt(id, undefined, payload);
 
-export const decodeJwt = async (jwt: string) => {
+export const decodeJwt = async (jwt: string, options?: VerifyOptions) => {
   try {
-    return await verify(jwt, jwtKey);
+    return await verify(jwt, jwtKey, options);
   } catch (_err) {
     return null;
   }

@@ -1,6 +1,7 @@
 import { db } from "@mongo/setupMongo.ts";
 
 export interface DiscordGuildMemberSchema {
+  _id: string;
   memberId: string;
   guildId: string;
   userId?: string;

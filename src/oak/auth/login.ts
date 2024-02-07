@@ -15,6 +15,7 @@ import User from "@mongo/schemas/User.ts";
 import { encodeRefreshJwt, encodeSessionJwt } from "@utils/api.ts";
 
 import { RequestSpec, validator } from "@shared/lib/api/server/auth/login.ts";
+import { ObjectId } from "mongo";
 
 export default createRoute((router) => {
   router.post("/login", async (ctx) => {
@@ -50,31 +51,6 @@ export default createRoute((router) => {
       if (meRes.error || !meRes.data)
         return unauthorizedError("Credidentials invalid")(ctx);
 
-      const user = await User.findAndModify(
-        {
-          discordUserId: meRes.data.user.id,
-        },
-        {
-          update: {
-            $set: {
-              discordUserId: meRes.data.user.id,
-              discordOauth: {
-                accessToken: tokenRes.data.access_token,
-                tokenType: tokenRes.data.token_type,
-                expiresIn: tokenRes.data.expires_in,
-                refreshToken: tokenRes.data.refresh_token,
-                scope: tokenRes.data.scope,
-              },
-            },
-          },
-          upsert: true,
-          new: true,
-          fields: {
-            discordUserId: 1,
-          },
-        }
-      );
-
       const discordUser = await DiscordUser.findAndModify(
         {
           userId: meRes.data.user.id,
@@ -92,10 +68,40 @@ export default createRoute((router) => {
         }
       );
 
-      const sessionToken = await encodeSessionJwt(meRes.data.user.id, {
+      if (!discordUser)
+        return error("Couldn't find or create discord user.")(ctx);
+
+      const user = await User.findAndModify(
+        {
+          discordUserId: new ObjectId(discordUser._id),
+        },
+        {
+          update: {
+            $set: {
+              discordUserId: new ObjectId(discordUser._id),
+              discordOauth: {
+                accessToken: tokenRes.data.access_token,
+                tokenType: tokenRes.data.token_type,
+                expiresIn: tokenRes.data.expires_in,
+                refreshToken: tokenRes.data.refresh_token,
+                scope: tokenRes.data.scope,
+              },
+            },
+          },
+          upsert: true,
+          new: true,
+          fields: {
+            discordUserId: 1,
+          },
+        }
+      );
+
+      if (!user) return error("Couldn't find or create user.")(ctx);
+
+      const sessionToken = await encodeSessionJwt(user._id, {
         type: "session",
       });
-      const refreshToken = await encodeRefreshJwt(meRes.data.user.id, {
+      const refreshToken = await encodeRefreshJwt(user._id, {
         type: "refresh",
       });
 
