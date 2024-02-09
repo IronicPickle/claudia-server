@@ -13,9 +13,10 @@ import DiscordEndpoints from "@discordApi/DiscordEndpoints.ts";
 import DiscordUser from "@mongo/schemas/DiscordUser.ts";
 import User from "@mongo/schemas/User.ts";
 import { encodeRefreshJwt, encodeSessionJwt } from "@utils/api.ts";
+import { ObjectId } from "mongo";
+import { isResError } from "@shared/lib/utils/api.ts";
 
 import { RequestSpec, validator } from "@shared/lib/api/server/auth/login.ts";
-import { ObjectId } from "mongo";
 
 export default createRoute((router) => {
   router.post("/login", async (ctx) => {
@@ -39,7 +40,7 @@ export default createRoute((router) => {
         },
       });
 
-      if (tokenRes.error || !tokenRes.data)
+      if (isResError(tokenRes))
         return unauthorizedError("Credidentials invalid")(ctx);
 
       const meRes = await DiscordEndpoints.oauth2.me.call({
@@ -48,7 +49,7 @@ export default createRoute((router) => {
         },
       });
 
-      if (meRes.error || !meRes.data)
+      if (isResError(meRes))
         return unauthorizedError("Credidentials invalid")(ctx);
 
       const discordUser = await DiscordUser.findAndModify(

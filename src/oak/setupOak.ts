@@ -5,6 +5,7 @@ import { ConsoleColor } from "@shared/lib/enums/generic.ts";
 import { httpMethodColors } from "@shared/lib/constants/generic.ts";
 import { oakCors } from "cors";
 import { decodeJwt } from "@utils/api.ts";
+import { forbiddenError, unauthorizedError } from "@shared/lib/utils/api.ts";
 
 export interface State {
   userId?: "internal" | string;
@@ -53,6 +54,18 @@ export default async () => {
       credentials: true,
     })
   );
+
+  app.use(async (ctx, next) => {
+    if (
+      ctx.request.url.pathname.startsWith("/internal") &&
+      ctx.state.userId !== "internal"
+    ) {
+      return forbiddenError()(ctx);
+    }
+
+    await next();
+  });
+
   app.use(router.routes());
   app.use(router.allowedMethods());
 
