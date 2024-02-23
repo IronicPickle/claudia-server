@@ -18,10 +18,10 @@ import { createRoute } from "@oak/setupOak.ts";
 import {
   RequestSpec,
   validator,
-} from "@shared/lib/api/server/internal/discord/guilds/{guildId}/members/{memberId}/create.ts";
+} from "../../../../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/[guildId]/members/[memberId]/create.ts";
 
 export default createRoute((router) => {
-  router.post("/:memberId", async (ctx) => {
+  router.post("/", async (ctx) => {
     const params = parseParams<RequestSpec["params"]>(ctx);
     const body = await parseBody<RequestSpec["body"]>(ctx);
     if (!body) return badRequestError("Body missing.")(ctx);

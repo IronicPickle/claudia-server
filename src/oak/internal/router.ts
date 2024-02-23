@@ -3,8 +3,8 @@ import { State } from "@oak/setupOak.ts";
 
 import discordRouter from "./discord/router.ts";
 
-const internalRouter = new Router<State>();
+const router = new Router<State>();
 
-internalRouter.use("/discord", discordRouter.routes());
+router.use("/discord", discordRouter.routes());
 
-export default internalRouter;
+export default router;

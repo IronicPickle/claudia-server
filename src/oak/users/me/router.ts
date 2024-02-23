@@ -3,8 +3,8 @@ import { State } from "@oak/setupOak.ts";
 
 import get from "./get.ts";
 
-const meRouter = new Router<State>();
+const router = new Router<State>();
 
-get.register(meRouter);
+get.register(router);
 
-export default meRouter;
+export default router;

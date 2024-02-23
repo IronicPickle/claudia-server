@@ -9,17 +9,17 @@ import {
 import { parseValidators } from "@shared/lib/utils/generic.ts";
 import DiscordGuild from "@mongo/schemas/DiscordGuild.ts";
 import { logError } from "@utils/generic.ts";
-import { upsertMembers } from "./utils.ts";
+import { upsertMembers } from "../utils.ts";
 import DiscordGuildMember from "@mongo/schemas/DiscordGuildMember.ts";
 import { createRoute } from "@oak/setupOak.ts";
 
 import {
   RequestSpec,
   validator,
-} from "@shared/lib/api/server/internal/discord/guilds/{guildId}/upsert.ts";
+} from "../../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/[guildId]/upsert.ts";
 
 export default createRoute((router) => {
-  router.put("/:guildId", async (ctx) => {
+  router.put("/", async (ctx) => {
     const params = parseParams<RequestSpec["params"]>(ctx);
     const body = await parseBody<RequestSpec["body"]>(ctx);
     if (!body) return badRequestError("Body missing.")(ctx);

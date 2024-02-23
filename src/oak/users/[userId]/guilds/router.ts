@@ -1,12 +1,10 @@
 import { Router } from "oak";
 import { State } from "@oak/setupOak.ts";
 
-import login from "./login.ts";
-import refresh from "./refresh.ts";
+import getAll from "./getAll.ts";
 
 const router = new Router<State>();
 
-login.register(router);
-refresh.register(router);
+getAll.register(router);
 
 export default router;

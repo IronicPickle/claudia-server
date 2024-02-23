@@ -1,6 +1,7 @@
 import {
   badRequestError,
   error,
+  notFoundError,
   ok,
   parseBody,
   parseParams,
@@ -15,10 +16,10 @@ import { createRoute } from "@oak/setupOak.ts";
 import {
   RequestSpec,
   validator,
-} from "@shared/lib/api/server/internal/discord/guilds/{guildId}/members/{memberId}/update.ts";
+} from "../../../../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/[guildId]/members/[memberId]/update.ts";
 
 export default createRoute((router) => {
-  router.put("/:memberId", async (ctx) => {
+  router.patch("/", async (ctx) => {
     const params = parseParams<RequestSpec["params"]>(ctx);
     const body = await parseBody<RequestSpec["body"]>(ctx);
     if (!body) return badRequestError("Body missing.")(ctx);
@@ -60,12 +61,11 @@ export default createRoute((router) => {
               premiumSince,
             },
           },
-          upsert: true,
           new: true,
         }
       );
 
-      if (!newMember) return error("Couldn't upsert guild member.")(ctx);
+      if (!newMember) return notFoundError("Guild member doesn't exist.")(ctx);
 
       let newUser: DiscordUserSchema | undefined;
 

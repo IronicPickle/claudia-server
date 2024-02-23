@@ -1,20 +1,14 @@
 import { Router } from "oak";
 import { State } from "@oak/setupOak.ts";
 
-import membersRouter from "./members/router.ts";
+import guildIdRouter from "./[guildId]/router.ts";
 
-import create from "./create.ts";
 import sync from "./sync.ts";
-import update from "./update.ts";
-import upsert from "./upsert.ts";
 
-const guildsRouter = new Router<State>();
+const router = new Router<State>();
 
-create.register(guildsRouter);
-sync.register(guildsRouter);
-update.register(guildsRouter);
-upsert.register(guildsRouter);
+sync.register(router);
 
-guildsRouter.use("/members", membersRouter.routes());
+router.use("/:guildId", guildIdRouter.routes());
 
-export default guildsRouter;
+export default router;

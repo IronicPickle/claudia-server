@@ -5,10 +5,10 @@ import create from "./create.ts";
 import update from "./update.ts";
 import upsert from "./upsert.ts";
 
-const membersRouter = new Router<State>();
+const router = new Router<State>();
 
-create.register(membersRouter);
-update.register(membersRouter);
-upsert.register(membersRouter);
+create.register(router);
+update.register(router);
+upsert.register(router);
 
-export default membersRouter;
+export default router;

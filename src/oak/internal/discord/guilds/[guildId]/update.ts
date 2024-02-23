@@ -1,7 +1,7 @@
 import {
   badRequestError,
-  conflictError,
   error,
+  notFoundError,
   ok,
   parseBody,
   parseParams,
@@ -10,23 +10,21 @@ import {
 import { parseValidators } from "@shared/lib/utils/generic.ts";
 import DiscordGuild from "@mongo/schemas/DiscordGuild.ts";
 import { logError } from "@utils/generic.ts";
-import { upsertMembers } from "./utils.ts";
-import DiscordGuildMember from "@mongo/schemas/DiscordGuildMember.ts";
 import { createRoute } from "@oak/setupOak.ts";
 
 import {
   RequestSpec,
   validator,
-} from "@shared/lib/api/server/internal/discord/guilds/{guildId}/create.ts";
+} from "../../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/[guildId]/update.ts";
 
 export default createRoute((router) => {
-  router.post("/:guildId", async (ctx) => {
+  router.patch("/", async (ctx) => {
     const params = parseParams<RequestSpec["params"]>(ctx);
     const body = await parseBody<RequestSpec["body"]>(ctx);
     if (!body) return badRequestError("Body missing.")(ctx);
 
     const { guildId } = params;
-    const { name, description, joinedAt, members } = body;
+    const { active, name, description, joinedAt } = body;
 
     const validators = validator({ ...params, ...body });
 
@@ -34,29 +32,25 @@ export default createRoute((router) => {
     if (validation.failed) return validationError(validation)(ctx);
 
     try {
-      const guild = await DiscordGuild.findOne({ guildId });
-      if (guild) return conflictError("Guild already exists.")(ctx);
-
-      const newGuild = await DiscordGuild.insertOne({
-        guildId,
-        active: true,
-        name,
-        description,
-        joinedAt,
-      });
-
-      const memberIds = members.map(({ memberId }) => memberId);
-
-      await DiscordGuildMember.updateMany(
-        { memberId: { $nin: memberIds }, guildId },
+      const guild = await DiscordGuild.findAndModify(
+        { guildId },
         {
-          $set: { active: false },
+          update: {
+            $set: {
+              guildId,
+              active,
+              name,
+              description,
+              joinedAt,
+            },
+          },
+          new: true,
         }
       );
 
-      await Promise.all(upsertMembers(members));
+      if (!guild) return notFoundError("Guild doesn't exist.")(ctx);
 
-      return ok(newGuild)(ctx);
+      return ok(guild)(ctx);
     } catch (err: any) {
       logError(err);
       return error("Something went wrong.")(ctx);
