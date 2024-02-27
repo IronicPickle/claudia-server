@@ -74,12 +74,12 @@ export default createRoute((router) => {
 
       const user = await User.findAndModify(
         {
-          discordUserId: new ObjectId(discordUser._id),
+          discordUserId: discordUser.userId,
         },
         {
           update: {
             $set: {
-              discordUserId: new ObjectId(discordUser._id),
+              discordUserId: discordUser.userId,
               discordOauth: {
                 accessToken: tokenRes.data.access_token,
                 tokenType: tokenRes.data.token_type,

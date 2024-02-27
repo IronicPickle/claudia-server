@@ -35,10 +35,10 @@ export default createRoute((router) => {
 
       if (!payload) return unauthorizedError("JWT signature invalid.")(ctx);
 
-      const userId = payload.sub;
+      const _id = payload.sub;
 
       const user = await User.findOne({
-        _id: new ObjectId(userId),
+        _id: new ObjectId(_id),
       });
 
       if (!user) return notFoundError("User not found.")(ctx);

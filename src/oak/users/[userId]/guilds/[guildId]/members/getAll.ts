@@ -7,12 +7,11 @@ import {
   validationError,
 } from "@shared/lib/utils/api.ts";
 import DiscordGuildMember from "@mongo/schemas/DiscordGuildMember.ts";
-import DiscordGuild from "@mongo/schemas/DiscordGuild.ts";
 import { logError } from "@utils/generic.ts";
 import {
   RequestSpec,
   validator,
-} from "@shared/lib/api/server/users/[userId]/guilds/getAll.ts";
+} from "@shared/lib/api/server/users/[userId]/guilds/[guildId]/members/getAll.ts";
 import { parseValidators } from "@shared/lib/utils/generic.ts";
 
 export default createRoute((router) => {
@@ -22,7 +21,7 @@ export default createRoute((router) => {
 
     const params = parseParams<RequestSpec["params"]>(ctx);
 
-    const { userId } = params;
+    const { userId, guildId } = params;
 
     const validators = validator(params);
 
@@ -32,20 +31,13 @@ export default createRoute((router) => {
     if (userId !== session.discordUser.userId) return unauthorizedError()(ctx);
 
     try {
-      const discordGuildMembers = DiscordGuildMember.find({
+      const discordGuildMembers = await DiscordGuildMember.find({
         userId,
-      });
-
-      const discordGuilds = await Promise.all(
-        await discordGuildMembers.map((discordGuild) =>
-          DiscordGuild.findOne({
-            guildId: discordGuild.guildId,
-          })
-        )
-      );
+        guildId,
+      }).toArray();
 
       return ok({
-        discordGuilds,
+        discordGuildMembers,
       })(ctx);
     } catch (err: any) {
       logError(err);

@@ -1,14 +1,23 @@
 import config from "@config/config.ts";
 import { Application, Router } from "oak";
-import { log } from "@utils/generic.ts";
+import { log, logError } from "@utils/generic.ts";
 import { ConsoleColor } from "@shared/lib/enums/generic.ts";
 import { httpMethodColors } from "@shared/lib/constants/generic.ts";
 import { oakCors } from "cors";
 import { decodeJwt } from "@utils/api.ts";
-import { forbiddenError, unauthorizedError } from "@shared/lib/utils/api.ts";
+import { forbiddenError } from "@shared/lib/utils/api.ts";
+import { ObjectId } from "mongo";
+import User from "@mongo/schemas/User.ts";
+import DiscordUser from "@mongo/schemas/DiscordUser.ts";
+import { UserSchema } from "@mongo/schemas/User.ts";
+import { DiscordUserSchema } from "@mongo/schemas/DiscordUser.ts";
 
 export interface State {
-  userId?: "internal" | string;
+  sessionUserId?: string;
+  session?: {
+    user: UserSchema;
+    discordUser: DiscordUserSchema;
+  };
 }
 
 export const createRoute = (callback: (router: Router<State>) => void) => ({
@@ -41,8 +50,12 @@ export default async () => {
     if (jwt) {
       const payload = await decodeJwt(jwt);
 
-      if (payload) state.userId = payload.sub;
+      if (payload?.sub) {
+        state.sessionUserId = payload.sub;
+        state.session = await fetchUsers(payload.sub);
+      }
     }
+
     await next();
   });
 
@@ -58,7 +71,7 @@ export default async () => {
   app.use(async (ctx, next) => {
     if (
       ctx.request.url.pathname.startsWith("/internal") &&
-      ctx.state.userId !== "internal"
+      ctx.state.sessionUserId !== "internal"
     ) {
       return forbiddenError()(ctx);
     }
@@ -79,4 +92,31 @@ export default async () => {
   });
 
   app.listen(config.oak.listenOptions);
+};
+
+const fetchUsers = async (_id: string) => {
+  try {
+    const user = await User.findOne(
+      {
+        _id: new ObjectId(_id),
+      },
+      {
+        projection: {
+          discordUserId: 1,
+        },
+      }
+    );
+
+    if (!user) return;
+
+    const discordUser = await DiscordUser.findOne({
+      userId: user.discordUserId,
+    });
+
+    if (!discordUser) return;
+
+    return { user, discordUser };
+  } catch (err) {
+    logError(err);
+  }
 };
