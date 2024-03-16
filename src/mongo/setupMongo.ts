@@ -1,8 +1,8 @@
 import config from "@config/config.ts";
 import { MongoClient } from "mongo";
 
-const client = new MongoClient();
+export const mongoClient = new MongoClient();
 
-await client.connect(config.mongo.address);
+await mongoClient.connect(config.mongo.address);
 
-export const db = client.database("claudia");
+export const db = mongoClient.database(config.mongo.dbName);

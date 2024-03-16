@@ -7,12 +7,14 @@ import {
   validationError,
 } from "@shared/lib/utils/api.ts";
 import DiscordGuildMember from "@mongo/schemas/DiscordGuildMember.ts";
+import { parseValidators } from "@shared/lib/utils/generic.ts";
+import DiscordUser from "@mongo/schemas/DiscordUser.ts";
 import { logError } from "@utils/generic.ts";
+
 import {
   RequestSpec,
   validator,
 } from "@shared/lib/api/server/users/[userId]/guilds/[guildId]/members/getAll.ts";
-import { parseValidators } from "@shared/lib/utils/generic.ts";
 
 export default createRoute((router) => {
   router.get("/", async (ctx) => {
@@ -31,13 +33,23 @@ export default createRoute((router) => {
     if (userId !== session.discordUser.userId) return unauthorizedError()(ctx);
 
     try {
-      const discordGuildMembers = await DiscordGuildMember.find({
-        userId,
-        guildId,
-      }).toArray();
+      const guildMembers = await DiscordGuildMember.aggregate([
+        { $match: { guildId } },
+        {
+          $lookup: {
+            from: DiscordUser.name,
+            localField: "userId",
+            foreignField: "userId",
+            as: "user",
+          },
+        },
+        {
+          $unwind: "$user",
+        },
+      ]).toArray();
 
       return ok({
-        discordGuildMembers,
+        guildMembers,
       })(ctx);
     } catch (err: any) {
       logError(err);

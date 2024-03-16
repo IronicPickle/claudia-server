@@ -13,6 +13,7 @@ const config: Config = {
   },
   mongo: {
     address: Deno.env.get("MONGO_ADDRESS") ?? "mongodb://127.0.0.1:27017",
+    dbName: Deno.env.get("DB_NAME") ?? "claudia",
   },
   discord: {
     clientId: Deno.env.get("DISCORD_CLIENT_ID") as string,

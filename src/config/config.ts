@@ -12,6 +12,7 @@ export interface Config {
   };
   mongo: {
     address: string;
+    dbName: string;
   };
   discord: {
     clientId: string;
