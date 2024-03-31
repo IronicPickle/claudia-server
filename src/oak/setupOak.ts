@@ -50,9 +50,13 @@ export default async () => {
     if (jwt) {
       const payload = await decodeJwt(jwt);
 
-      if (payload?.sub && payload.sub !== "internal") {
-        state.sessionUserId = payload.sub;
-        state.session = await fetchUsers(payload.sub);
+      if (payload?.sub) {
+        if (payload.sub !== "internal") {
+          state.sessionUserId = payload.sub;
+          state.session = await fetchUsers(payload.sub);
+        } else {
+          state.sessionUserId = "internal";
+        }
       }
     }
 
