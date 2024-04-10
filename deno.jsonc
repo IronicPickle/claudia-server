@@ -23,6 +23,7 @@
 
     "@config/": "./src/config/",
     "@api/": "./src/api/",
+    "@sockets/": "./src/sockets/",
     "@discordApi/": "./src/discordApi/",
 
     "@mongo/": "./src/mongo/",

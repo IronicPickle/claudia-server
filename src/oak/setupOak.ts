@@ -53,7 +53,7 @@ export default async () => {
       if (payload?.sub) {
         if (payload.sub !== "internal") {
           state.sessionUserId = payload.sub;
-          state.session = await fetchUsers(payload.sub);
+          state.session = await fetchUser(payload.sub);
         } else {
           state.sessionUserId = "internal";
         }
@@ -98,7 +98,7 @@ export default async () => {
   app.listen(config.oak.listenOptions);
 };
 
-const fetchUsers = async (_id: string) => {
+export const fetchUser = async (_id: string) => {
   try {
     const user = await User.findOne(
       {

@@ -4,6 +4,7 @@ import setupOak from "@oak/setupOak.ts";
 
 import "@mongo/setupMongo.ts";
 import startupSetup from "./startupSetup.ts";
+import { guildServerSockets } from "@sockets/guilds.ts";
 
 const start = () => {
   if (!config.authSecret) throw Error("AUTH_SECRET missing in env!");
@@ -17,3 +18,7 @@ const start = () => {
 };
 
 start();
+
+// setInterval(() => {
+//   console.log(Object.keys(guildSockets.getSockets()));
+// }, 1000);
