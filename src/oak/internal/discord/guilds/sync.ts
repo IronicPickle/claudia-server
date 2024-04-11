@@ -17,6 +17,8 @@ import {
   RequestSpec,
   validator,
 } from "@shared/lib/api/server/internal/discord/guilds/sync.ts";
+import { guildServerSockets } from "@sockets/guilds.ts";
+import SocketsManager from "@shared/lib/objects/SocketsManager.ts";
 
 export default createRoute((router) => {
   router.put("/sync", async (ctx) => {
@@ -87,6 +89,10 @@ export default createRoute((router) => {
         }
       );
 
+      for (const guild of guilds) {
+        guildServerSockets[guild.guildId] = new SocketsManager();
+      }
+
       log(
         "Guild sync complete -",
         guilds.length,
@@ -94,7 +100,9 @@ export default createRoute((router) => {
         upsertedCount,
         "upserted -",
         modifiedCount,
-        "modified."
+        "modified -",
+        Object.keys(guildServerSockets).length,
+        "socket managers created."
       );
 
       return ok({ upsertedCount, modifiedCount })(ctx);

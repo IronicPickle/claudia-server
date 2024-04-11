@@ -4,7 +4,7 @@ import { isDev } from "@config/config.ts";
 
 export const log = (...text: any[]) =>
   console.log(
-    ...text.reduce((acc: string[], text) => {
+    ...text.reduce((acc: any[], text) => {
       if (
         enumContains(ConsoleColor, text) ||
         enumContains(ConsoleColor, acc[acc.length - 1])
@@ -17,3 +17,6 @@ export const log = (...text: any[]) =>
 
 export const logError = (...text: any[]) =>
   isDev && console.error("[Dev]", "[ERROR]", ...text);
+
+export const logWs = (...text: any[]) =>
+  log(ConsoleColor.Blue, "[WS]", ConsoleColor.Reset, ...text);

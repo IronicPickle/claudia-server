@@ -9,7 +9,7 @@ import {
 } from "@shared/lib/utils/api.ts";
 import { parseValidators } from "@shared/lib/utils/generic.ts";
 import DiscordGuild from "@mongo/schemas/DiscordGuild.ts";
-import { logError } from "@utils/generic.ts";
+import { log, logError } from "@utils/generic.ts";
 import { upsertMembers } from "../utils.ts";
 import DiscordGuildMember from "@mongo/schemas/DiscordGuildMember.ts";
 import { createRoute } from "@oak/setupOak.ts";
@@ -18,6 +18,8 @@ import {
   RequestSpec,
   validator,
 } from "../../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/[guildId]/create.ts";
+import { guildServerSockets } from "@sockets/guilds.ts";
+import SocketsManager from "@shared/lib/objects/SocketsManager.ts";
 
 export default createRoute((router) => {
   router.post("/", async (ctx) => {
@@ -55,6 +57,9 @@ export default createRoute((router) => {
       );
 
       await Promise.all(upsertMembers(members));
+
+      guildServerSockets[guildId] = new SocketsManager();
+      log(`Created socket manager for guild: ${guildId}`);
 
       return ok(newGuild)(ctx);
     } catch (err: any) {
