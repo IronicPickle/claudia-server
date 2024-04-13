@@ -9,6 +9,7 @@ import config from "@config/config.ts";
 import { log } from "@utils/generic.ts";
 import { ConsoleColor } from "@shared/lib/enums/generic.ts";
 import { logWs } from "@utils/generic.ts";
+import SocketsManager from "@shared/lib/objects/SocketsManager.ts";
 
 export default class AudioStreamSocketServer extends SocketServer {
   private guildId: string;
@@ -33,7 +34,15 @@ export default class AudioStreamSocketServer extends SocketServer {
 
       if (!guild) return false;
 
-      guildServerSockets[guildId].add(user.discordUser.userId, this);
+      let guildSocketsManager = guildServerSockets[guildId];
+
+      if (!guildSocketsManager) {
+        guildSocketsManager = new SocketsManager();
+        guildServerSockets[guildId] = guildSocketsManager;
+        log(`Created socket manager for guild: ${guildId}`);
+      }
+
+      guildSocketsManager.add(user.discordUser.userId, this);
 
       return true;
     });
