@@ -27,6 +27,22 @@ export default class AudioStreamSocketClient extends SocketClient {
 
     this.guildSocketsManager = guildSocketsManager;
 
+    this.addEventListener("message", ({ name, data }) => {
+      const serverSockets = this.guildSocketsManager.getSockets();
+      const serverSocket = serverSockets[data.userId];
+      if (!serverSocket) return;
+
+      this.logEvent(
+        ConsoleColor.Magenta,
+        "PASSTHROUGH",
+        "-",
+        name,
+        ConsoleColor.Reset,
+        data
+      );
+      serverSocket.send(name, data);
+    });
+
     this.addEventListener("messageRaw", (data) => {
       const sockets = this.guildSocketsManager.getSockets();
       for (const i in sockets) {
@@ -49,13 +65,16 @@ export default class AudioStreamSocketClient extends SocketClient {
     });
   }
 
-  private logEvent(color: ConsoleColor, event: string) {
+  private logEvent(color: ConsoleColor, event: string, ...text: any[]) {
     logWs(
       ConsoleColor.Cyan,
-      "Bot Socket",
+      "Bot server",
       "-",
       color,
       event,
+      ConsoleColor.Cyan,
+      ...text,
+      "",
       ConsoleColor.Cyan,
       "-",
       this.guildId,

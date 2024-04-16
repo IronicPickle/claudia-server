@@ -49,6 +49,21 @@ export default class AudioStreamSocketServer extends SocketServer {
 
     this.guildId = guildId;
 
+    this.addEventListener("message", ({ name, data }) => {
+      const clientSocket = guildClientSockets.getSocket(this.guildId);
+      if (!clientSocket || !data.userId) return;
+
+      this.logEvent(
+        ConsoleColor.Magenta,
+        "PASSTHROUGH",
+        "-",
+        name,
+        ConsoleColor.Reset,
+        data
+      );
+      clientSocket.send(name, data);
+    });
+
     this.addEventListener("authenticated", () => {
       const clientSocket = guildClientSockets.getSocket(this.guildId);
       if (clientSocket) return;
@@ -75,13 +90,16 @@ export default class AudioStreamSocketServer extends SocketServer {
     });
   }
 
-  private logEvent(color: ConsoleColor, event: string) {
+  private logEvent(color: ConsoleColor, event: string, ...text: any[]) {
     logWs(
       ConsoleColor.Cyan,
       "Web client",
       "-",
       color,
       event,
+      ConsoleColor.Cyan,
+      ...text,
+      "",
       ConsoleColor.Cyan,
       "-",
       this.guildId,
