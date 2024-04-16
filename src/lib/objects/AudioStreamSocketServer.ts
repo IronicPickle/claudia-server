@@ -42,7 +42,7 @@ export default class AudioStreamSocketServer extends SocketServer {
         log(`Created socket manager for guild: ${guildId}`);
       }
 
-      guildSocketsManager.add(user.discordUser.userId, this);
+      guildSocketsManager.add(this.id, this);
 
       return true;
     });
@@ -50,8 +50,10 @@ export default class AudioStreamSocketServer extends SocketServer {
     this.guildId = guildId;
 
     this.addEventListener("message", ({ name, data }) => {
+      if (name.includes("authenticate")) return;
+
       const clientSocket = guildClientSockets.getSocket(this.guildId);
-      if (!clientSocket || !data.userId) return;
+      if (!clientSocket) return;
 
       this.logEvent(
         ConsoleColor.Magenta,
@@ -61,7 +63,10 @@ export default class AudioStreamSocketServer extends SocketServer {
         ConsoleColor.Reset,
         data
       );
-      clientSocket.send(name, data);
+      clientSocket.send(name, {
+        ...data,
+        socketId: this.id,
+      });
     });
 
     this.addEventListener("authenticated", () => {

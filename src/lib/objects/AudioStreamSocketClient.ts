@@ -28,19 +28,38 @@ export default class AudioStreamSocketClient extends SocketClient {
     this.guildSocketsManager = guildSocketsManager;
 
     this.addEventListener("message", ({ name, data }) => {
-      const serverSockets = this.guildSocketsManager.getSockets();
-      const serverSocket = serverSockets[data.userId];
-      if (!serverSocket) return;
+      if (name.includes("authenticate")) return;
 
-      this.logEvent(
-        ConsoleColor.Magenta,
-        "PASSTHROUGH",
-        "-",
-        name,
-        ConsoleColor.Reset,
-        data
-      );
-      serverSocket.send(name, data);
+      const serverSockets = this.guildSocketsManager.getSockets();
+      const serverSocket = serverSockets[data.socketId];
+      if (serverSocket) {
+        this.logEvent(
+          ConsoleColor.Magenta,
+          "PASSTHROUGH",
+          "-",
+          name,
+          ConsoleColor.Reset,
+          data
+        );
+
+        serverSocket.send(name, data);
+      } else if (name.includes("event")) {
+        for (const i in serverSockets) {
+          this.logEvent(
+            ConsoleColor.Red,
+            "EVENT",
+            "-",
+            name,
+            ConsoleColor.Reset,
+            data
+          );
+
+          const socket = serverSockets[i];
+          socket.send(name, data);
+        }
+      } else {
+        console.log({ serverSocket });
+      }
     });
 
     this.addEventListener("messageRaw", (data) => {
