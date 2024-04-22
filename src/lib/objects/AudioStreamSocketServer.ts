@@ -90,8 +90,15 @@ export default class AudioStreamSocketServer extends SocketServer {
       this.logEvent(ConsoleColor.Green, "OPEN");
     });
 
-    this.addEventListener("close", () => {
-      this.logEvent(ConsoleColor.Red, "CLOSE");
+    this.addEventListener("close", (code, wasClean) => {
+      this.logEvent(
+        ConsoleColor.Red,
+        "CLOSE",
+        "-",
+        code,
+        "-",
+        wasClean ? "clean" : "unclean"
+      );
     });
   }
 

@@ -10,27 +10,22 @@ const token = await encodeSessionJwt("internal");
 export default class AudioStreamSocketClient extends SocketClient {
   private guildId: string;
 
-  private guildSocketsManager: (typeof guildServerSockets)[string];
-
   constructor(url: string, guildId: string) {
     super(url, token);
 
     this.guildId = guildId;
 
-    let guildSocketsManager = guildServerSockets[guildId];
+    const guildSocketsManager = this.getGuildSocketsManager();
 
     if (!guildSocketsManager) {
-      guildSocketsManager = new SocketsManager();
-      guildServerSockets[guildId] = guildSocketsManager;
+      guildServerSockets[guildId] = new SocketsManager();
       log(`Created socket manager for guild: ${guildId}`);
     }
-
-    this.guildSocketsManager = guildSocketsManager;
 
     this.addEventListener("message", ({ name, data }) => {
       if (name.includes("authenticate")) return;
 
-      const serverSockets = this.guildSocketsManager.getSockets();
+      const serverSockets = this.getGuildSocketsManager().getSockets();
       const serverSocket = serverSockets[data.socketId];
       if (serverSocket) {
         this.logEvent(
@@ -58,16 +53,25 @@ export default class AudioStreamSocketClient extends SocketClient {
           socket.send(name, data);
         }
       } else {
-        console.log({ serverSocket });
+        console.log(serverSockets, { serverSocket }, data.socketId);
       }
     });
 
     this.addEventListener("messageRaw", (data) => {
-      const sockets = this.guildSocketsManager.getSockets();
+      const sockets = this.getGuildSocketsManager().getSockets();
       for (const i in sockets) {
         const socket = sockets[i];
 
         socket.sendRaw(data);
+      }
+    });
+
+    this.addEventListener("close", () => {
+      const sockets = this.getGuildSocketsManager().getSockets();
+      for (const i in sockets) {
+        const socket = sockets[i];
+
+        socket.destroy();
       }
     });
 
@@ -79,8 +83,15 @@ export default class AudioStreamSocketClient extends SocketClient {
       this.logEvent(ConsoleColor.Green, "OPEN");
     });
 
-    this.addEventListener("close", () => {
-      this.logEvent(ConsoleColor.Red, "CLOSE");
+    this.addEventListener("close", (code, wasClean) => {
+      this.logEvent(
+        ConsoleColor.Red,
+        "CLOSE",
+        "-",
+        code,
+        "-",
+        wasClean ? "clean" : "unclean"
+      );
     });
   }
 
@@ -99,5 +110,9 @@ export default class AudioStreamSocketClient extends SocketClient {
       this.guildId,
       ConsoleColor.Reset
     );
+  }
+
+  private getGuildSocketsManager() {
+    return guildServerSockets[this.guildId];
   }
 }
