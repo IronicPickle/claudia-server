@@ -50,7 +50,7 @@ export default class AudioStreamSocketServer extends SocketServer {
     this.guildId = guildId;
 
     this.addEventListener("message", ({ name, data }) => {
-      if (name.includes("authenticate")) return;
+      if (name.includes("authenticate") || name.includes("heartbeat")) return;
 
       const clientSocket = guildClientSockets.getSocket(this.guildId);
       if (!clientSocket) return;
@@ -84,6 +84,10 @@ export default class AudioStreamSocketServer extends SocketServer {
 
     this.addEventListener("authenticated", () => {
       this.logEvent(ConsoleColor.Yellow, "AUTHENTICATED");
+    });
+
+    this.addEventListener("heartbeat", () => {
+      this.logEvent(ConsoleColor.White, "HEARTBEAT");
     });
 
     this.addEventListener("open", () => {

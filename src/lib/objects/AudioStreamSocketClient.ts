@@ -5,13 +5,14 @@ import { guildServerSockets } from "@sockets/guilds.ts";
 import { log, logWs } from "@utils/generic.ts";
 import { ConsoleColor } from "@shared/lib/enums/generic.ts";
 
-const token = await encodeSessionJwt("internal");
+const TOKEN = await encodeSessionJwt("internal");
+const HEARTBEAT_INTERVAL_MS = 1000 * 60 * 2;
 
 export default class AudioStreamSocketClient extends SocketClient {
   private guildId: string;
 
   constructor(url: string, guildId: string) {
-    super(url, token);
+    super(url, TOKEN, HEARTBEAT_INTERVAL_MS);
 
     this.guildId = guildId;
 
@@ -23,7 +24,7 @@ export default class AudioStreamSocketClient extends SocketClient {
     }
 
     this.addEventListener("message", ({ name, data }) => {
-      if (name.includes("authenticate")) return;
+      if (name.includes("authenticate") || name.includes("heartbeat")) return;
 
       const serverSockets = this.getGuildSocketsManager().getSockets();
       const serverSocket = serverSockets[data.socketId];
@@ -77,6 +78,10 @@ export default class AudioStreamSocketClient extends SocketClient {
 
     this.addEventListener("authenticated", () => {
       this.logEvent(ConsoleColor.Yellow, "AUTHENTICATED");
+    });
+
+    this.addEventListener("heartbeat", () => {
+      this.logEvent(ConsoleColor.White, "HEARTBEAT");
     });
 
     this.addEventListener("open", () => {
