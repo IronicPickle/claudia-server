@@ -66,6 +66,7 @@ export default class AudioStreamSocketServer extends SocketServer {
       clientSocket.send(name, {
         ...data,
         socketId: this.id,
+        userId: this.userId,
       });
     });
 
