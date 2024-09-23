@@ -10,42 +10,51 @@ import { log } from "@utils/generic.ts";
 import { ConsoleColor } from "@shared/lib/enums/generic.ts";
 import { logWs } from "@utils/generic.ts";
 import SocketsManager from "@shared/lib/objects/SocketsManager.ts";
+import { SocketMessageNames } from "@shared/lib/ts/sockets.ts";
 
 export default class AudioStreamSocketServer extends SocketServer {
   private guildId: string;
   private userId?: string;
 
   constructor(socket: WebSocket, guildId: string) {
-    super(socket, async (token) => {
-      const payload = await decodeJwt(token);
+    super(
+      socket,
+      async (token) => {
+        const payload = await decodeJwt(token);
 
-      if (!payload?.sub) return false;
+        if (!payload?.sub) return false;
 
-      const user = await fetchUser(payload.sub);
+        const user = await fetchUser(payload.sub);
 
-      if (!user) return false;
+        if (!user) return false;
 
-      this.userId = user.discordUser.userId;
+        this.userId = user.discordUser.userId;
 
-      const guild = await DiscordGuildMember.findOne({
-        guildId,
-        userId: user.discordUser.userId,
-      });
+        const guild = await DiscordGuildMember.findOne({
+          guildId,
+          userId: user.discordUser.userId,
+        });
 
-      if (!guild) return false;
+        if (!guild) return false;
 
-      let guildSocketsManager = guildServerSockets[guildId];
+        let guildSocketsManager = guildServerSockets[guildId];
 
-      if (!guildSocketsManager) {
-        guildSocketsManager = new SocketsManager();
-        guildServerSockets[guildId] = guildSocketsManager;
-        log(`Created socket manager for guild: ${guildId}`);
+        // Create socket manager if not created
+        if (!guildSocketsManager) {
+          guildSocketsManager = new SocketsManager();
+          guildServerSockets[guildId] = guildSocketsManager;
+          log(`Created socket manager for guild: ${guildId}`);
+        }
+
+        // Push socket server to socket manager
+        guildSocketsManager.add(this.id, this);
+
+        return true;
+      },
+      {
+        resOnAuth: false,
       }
-
-      guildSocketsManager.add(this.id, this);
-
-      return true;
-    });
+    );
 
     this.guildId = guildId;
 
@@ -72,15 +81,18 @@ export default class AudioStreamSocketServer extends SocketServer {
 
     this.addEventListener("authenticated", () => {
       const clientSocket = guildClientSockets.getSocket(this.guildId);
-      if (clientSocket) return;
+      if (clientSocket) return this.send(SocketMessageNames.AuthenticateRes);
 
-      guildClientSockets.add(
-        this.guildId,
-        new AudioStreamSocketClient(
-          `${config.internal.botAddress}/internal/guilds/${this.guildId}/audioStream`,
-          this.guildId
-        )
+      const newClientSocket = new AudioStreamSocketClient(
+        `${config.internal.botAddress}/internal/guilds/${this.guildId}/audioStream`,
+        this.guildId
       );
+
+      newClientSocket.once("authenticated", () =>
+        this.send(SocketMessageNames.AuthenticateRes)
+      );
+
+      guildClientSockets.add(this.guildId, newClientSocket);
     });
 
     this.addEventListener("authenticated", () => {
