@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "name": "Web Server",
+      "path": "./"
+    },
+    {
+      "name": "Shared",
+      "path": "../claudia-shared"
+    }
+  ],
+  "settings": {}
+}
