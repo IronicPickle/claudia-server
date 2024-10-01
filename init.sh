@@ -47,9 +47,6 @@ cd $CURR_DIR
 # Setup main enviro
 printf "\n\\e[1m> Installing \e[33mclaudia-server\e[0m\e[1m environment\e[0m\n\n"
 
-printf "\nCreating python virtual environment\n"
-python3 -m venv .venv
-
 if [ "$NO_DB" != "true" ]; then
   if [ ! "$(docker ps -a -q -f name=docker-mongo)" ]; then
     echo "Configuring mongo docker container"
