@@ -8,7 +8,7 @@ import {
   parseParams,
   validationError,
 } from "@shared/lib/utils/api.ts";
-import { parseValidators } from "@shared/lib/utils/generic.ts";
+import { isString, parseValidators } from "@shared/lib/utils/generic.ts";
 import { logError } from "@utils/generic.ts";
 import DiscordGuild from "@mongo/schemas/DiscordGuild.ts";
 import DiscordGuildMember from "@mongo/schemas/DiscordGuildMember.ts";
@@ -65,6 +65,8 @@ export default createRoute((router) => {
         communicationDisabledUntil,
         premiumSince,
       });
+
+      if (isString(newMember)) return error("Something went wrong.")(ctx);
 
       let newUser: DiscordUserSchema | undefined;
 
