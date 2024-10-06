@@ -217,8 +217,8 @@
     "https://deno.land/x/oak@v12.6.0/util.ts": "0a3fdffb114859c2de84e1783efa3a544af4d2af8c6f08e0d25655de9d3e69bb",
     "https://deno.land/x/path_to_regexp@v6.2.1/index.ts": "894060567837bae8fc9c5cbd4d0a05e9024672083d5883b525c031eea940e556",
     "https://deno.land/x/web_bson@v0.3.0/mod.js": "8e14aecd31ee63abd30e2dbaa284b4b67abb7ba51fcef5b96af74727cb7c7940",
-    "https://esm.sh/ky@1.1.3": "9c3657c82f0ae330eaec2ad3c27bc9ee2e0b947f3a723673212d21988ba53325",
-    "https://esm.sh/v133/ky@1.1.3/denonext/ky.mjs": "6babfbef9debcf3a28dda275c0c477206002c82635f8ef9a3173ae69002f25f6"
+    "https://esm.sh/ky@1.7.2": "5238ce1d59e224c5ac583a5d5a77f455d74860cbdc54f09bc170c7469983b7d5",
+    "https://esm.sh/v135/ky@1.7.2/denonext/ky.mjs": "b5a85e5c12a91004096c4acf413d55cbc659139fb95455136aebcb73916ef95c"
   },
   "workspace": {
     "dependencies": [
