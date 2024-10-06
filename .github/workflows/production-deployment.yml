@@ -31,8 +31,8 @@ jobs:
           echo OAK_PORT=8090 >> .env
           echo MONGO_ADDRESS=${{ secrets.MONGO_ADDRESS }} >> .env
           echo INTERNAL_BOT_ADDRESS=http://localhost:8091 >> .env
-          echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} >> .env
-          echo DISCORD_BOT_ID=${{ secrets.DISCORD_BOT_ID }} >> .env
+          echo DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_TOKEN }} >> .env
+          echo DISCORD_CLIENT_ID=${{ secrets.DISCORD_BOT_ID }} >> .env
           echo AUTH_SECRET=${{ secrets.AUTH_SECRET }} >> .env
 
       - name: Check Application
