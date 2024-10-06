@@ -1,0 +1,55 @@
+name: Production Deployment
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "v1.x"
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Initialise Environment
+        run: ./init.sh master ${{ secrets.DEPLOYMENT_USERNAME }} ${{ secrets.DEPLOYMENT_TOKEN }} true
+
+      - name: Inject env vars
+        run: |
+          echo DENO_ENV=development > .env
+          echo OAK_PORT=8090 >> .env
+          echo MONGO_ADDRESS=${{ secrets.MONGO_ADDRESS }} >> .env
+          echo INTERNAL_BOT_ADDRESS=http://localhost:8091 >> .env
+          echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} >> .env
+          echo DISCORD_BOT_ID=${{ secrets.DISCORD_BOT_ID }} >> .env
+          echo AUTH_SECRET=${{ secrets.AUTH_SECRET }} >> .env
+
+      - name: Check Application
+        run: ./check.sh
+
+      - name: Create tarball
+        run: tar -czf ../dist.tar.gz ../*
+
+      - name: Copy build to remote
+        run: scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ../dist.tar.gz home-server@ironicpickle.uk:/home/home-server/claudia/production/claudia-server
+
+      - name: Deploy to remote
+        run: |
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null home-server@ironicpickle.uk "\
+            cd /home/home-server/claudia/production/claudia-server
+            rm ./dist -rf && \
+            mkdir ./dist && \
+            tar -xzf dist.tar.gz -C ./dist && \
+            rm dist.tar.gz && \
+            systemctl --user restart claudia-server-production"
