@@ -67,12 +67,7 @@ export default async () => {
 
   app.use(
     oakCors({
-      origin: [
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "https://claudia.ironicpickle.uk",
-        "https://staging.claudia.ironicpickle.uk/",
-      ],
+      origin: "*",
       credentials: true,
     })
   );
