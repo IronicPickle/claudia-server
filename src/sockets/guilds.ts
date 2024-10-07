@@ -2,7 +2,7 @@ import SocketsManager from "@shared/lib/objects/SocketsManager.ts";
 import AudioStreamSocketServer from "@objects/AudioStreamSocketServer.ts";
 import AudioStreamSocketClient from "@objects/AudioStreamSocketClient.ts";
 
-export const guildServerSockets = {} as Record<
+export const guildServerSocketManagers = {} as Record<
   string,
   SocketsManager<Record<string, AudioStreamSocketServer>>
 >;

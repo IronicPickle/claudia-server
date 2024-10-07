@@ -17,7 +17,7 @@ import {
   RequestSpec,
   validator,
 } from "@shared/lib/api/server/internal/discord/guilds/sync.ts";
-import { guildServerSockets } from "@sockets/guilds.ts";
+import { guildServerSocketManagers } from "@sockets/guilds.ts";
 import SocketsManager from "@shared/lib/objects/SocketsManager.ts";
 
 export default createRoute((router) => {
@@ -90,7 +90,7 @@ export default createRoute((router) => {
       );
 
       for (const guild of guilds) {
-        guildServerSockets[guild.guildId] = new SocketsManager();
+        guildServerSocketManagers[guild.guildId] = new SocketsManager();
       }
 
       log(
@@ -101,7 +101,7 @@ export default createRoute((router) => {
         "upserted -",
         modifiedCount,
         "modified -",
-        Object.keys(guildServerSockets).length,
+        Object.keys(guildServerSocketManagers).length,
         "socket managers created."
       );
 

@@ -2,7 +2,7 @@ import SocketServer from "@shared/lib/objects/SocketServer.ts";
 import { decodeJwt } from "@utils/api.ts";
 import { fetchUser } from "@oak/setupOak.ts";
 import DiscordGuildMember from "@mongo/schemas/DiscordGuildMember.ts";
-import { guildServerSockets } from "@sockets/guilds.ts";
+import { guildServerSocketManagers } from "@sockets/guilds.ts";
 import { guildClientSockets } from "@sockets/guilds.ts";
 import AudioStreamSocketClient from "./AudioStreamSocketClient.ts";
 import config from "@config/config.ts";
@@ -37,12 +37,12 @@ export default class AudioStreamSocketServer extends SocketServer {
 
         if (!guild) return false;
 
-        let guildSocketsManager = guildServerSockets[guildId];
+        let guildSocketsManager = guildServerSocketManagers[guildId];
 
         // Create socket manager if not created
         if (!guildSocketsManager) {
           guildSocketsManager = new SocketsManager();
-          guildServerSockets[guildId] = guildSocketsManager;
+          guildServerSocketManagers[guildId] = guildSocketsManager;
           log(`Created socket manager for guild: ${guildId}`);
         }
 

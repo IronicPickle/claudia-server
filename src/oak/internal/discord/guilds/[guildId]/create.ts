@@ -18,7 +18,7 @@ import {
   RequestSpec,
   validator,
 } from "../../../../../../../claudia-shared/lib/api/server/internal/discord/guilds/[guildId]/create.ts";
-import { guildServerSockets } from "@sockets/guilds.ts";
+import { guildServerSocketManagers } from "@sockets/guilds.ts";
 import SocketsManager from "@shared/lib/objects/SocketsManager.ts";
 
 export default createRoute((router) => {
@@ -58,7 +58,7 @@ export default createRoute((router) => {
 
       await Promise.all(upsertMembers(members));
 
-      guildServerSockets[guildId] = new SocketsManager();
+      guildServerSocketManagers[guildId] = new SocketsManager();
       log(`Created socket manager for guild: ${guildId}`);
 
       return ok(newGuild)(ctx);
