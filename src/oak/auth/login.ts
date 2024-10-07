@@ -50,7 +50,7 @@ export default createRoute((router) => {
       });
 
       if (isResError(meRes))
-        return unauthorizedError("Credidentials invalid")(ctx);
+        return unauthorizedError("User does not exist")(ctx);
 
       const discordUser = await DiscordUser.findAndModify(
         {
