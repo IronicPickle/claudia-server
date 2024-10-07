@@ -40,8 +40,6 @@ export default createRoute((router) => {
         },
       });
 
-      console.log(tokenRes);
-
       if (isResError(tokenRes))
         return unauthorizedError("Credidentials invalid")(ctx);
 
