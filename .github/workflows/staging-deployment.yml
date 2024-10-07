@@ -52,4 +52,4 @@ jobs:
             mkdir ./dist && \
             tar -xzf dist.tar.gz -C ./dist && \
             rm dist.tar.gz && \
-            systemctl --user restart claudia-server-staging"
+            sudo systemctl restart claudia-server-staging"
