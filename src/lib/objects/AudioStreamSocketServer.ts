@@ -37,7 +37,7 @@ export default class AudioStreamSocketServer extends SocketServer {
 
         if (!guild) return false;
 
-        let guildSocketsManager = guildServerSocketManagers[guildId];
+        let guildSocketsManager = this.getGuildSocketsManager();
 
         // Create socket manager if not created
         if (!guildSocketsManager) {
@@ -95,6 +95,15 @@ export default class AudioStreamSocketServer extends SocketServer {
       guildClientSockets.add(this.guildId, newClientSocket);
     });
 
+    this.addEventListener("close", () => {
+      const guildSocketsManager = this.getGuildSocketsManager();
+
+      console.log(Object.keys(guildSocketsManager.getSockets()).length);
+
+      if (Object.keys(guildSocketsManager.getSockets()).length <= 1)
+        guildClientSockets.getSocket(this.guildId).destroy();
+    });
+
     this.addEventListener("authenticated", () => {
       this.logEvent(ConsoleColor.Yellow, "AUTHENTICATED");
     });
@@ -134,5 +143,9 @@ export default class AudioStreamSocketServer extends SocketServer {
       this.guildId,
       ConsoleColor.Reset
     );
+  }
+
+  private getGuildSocketsManager() {
+    return guildServerSocketManagers[this.guildId];
   }
 }
