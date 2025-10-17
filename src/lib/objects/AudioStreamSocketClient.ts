@@ -1,7 +1,7 @@
 import SocketClient from "@shared/lib/objects/SocketClient.ts";
 import SocketsManager from "@shared/lib/objects/SocketsManager.ts";
 import { encodeSessionJwt } from "@utils/api.ts";
-import { guildServerSockets } from "@sockets/guilds.ts";
+import { guildServerSocketManagers } from "@sockets/guilds.ts";
 import { log, logWs } from "@utils/generic.ts";
 import { ConsoleColor } from "@shared/lib/enums/generic.ts";
 
@@ -19,7 +19,7 @@ export default class AudioStreamSocketClient extends SocketClient {
     const guildSocketsManager = this.getGuildSocketsManager();
 
     if (!guildSocketsManager) {
-      guildServerSockets[guildId] = new SocketsManager();
+      guildServerSocketManagers[guildId] = new SocketsManager();
       log(`Created socket manager for guild: ${guildId}`);
     }
 
@@ -70,9 +70,7 @@ export default class AudioStreamSocketClient extends SocketClient {
     this.addEventListener("close", () => {
       const sockets = this.getGuildSocketsManager().getSockets();
       for (const i in sockets) {
-        const socket = sockets[i];
-
-        socket.destroy();
+        this.getGuildSocketsManager().destroy(i);
       }
     });
 
@@ -118,6 +116,6 @@ export default class AudioStreamSocketClient extends SocketClient {
   }
 
   private getGuildSocketsManager() {
-    return guildServerSockets[this.guildId];
+    return guildServerSocketManagers[this.guildId];
   }
 }
